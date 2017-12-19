@@ -1,0 +1,20 @@
+﻿<ContentPage
+    x:Class="Forms.VisualStateManager.Sample.MainPage"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:visualStateManager="clr-namespace:Forms.VisualStateManager;assembly=Forms.VisualStateManager">
+    <Label
+        HorizontalOptions="Center"
+        Text="Welcome to Xamarin.Forms!"
+        VerticalOptions="Center">
+        <visualStateManager:VisualStateManager.VisualStateGroups>
+            <visualStateManager:VisualStateGroupCollection>
+                <visualStateManager:VisualStateGroup Name="a">
+                    <visualStateManager:VisualStateGroup.States>
+                        <visualStateManager:VisualState Name="a1" />
+                    </visualStateManager:VisualStateGroup.States>
+                </visualStateManager:VisualStateGroup>
+            </visualStateManager:VisualStateGroupCollection>
+        </visualStateManager:VisualStateManager.VisualStateGroups>
+    </Label>
+</ContentPage>
