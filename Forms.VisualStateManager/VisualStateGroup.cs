@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Xamarin.Forms;
 
 namespace Forms.VisualStateManager
@@ -66,16 +67,35 @@ namespace Forms.VisualStateManager
             if (currentStateName == stateName) return;
 
             var stateToSet = States.FirstOrDefault(x => x.Name == stateName);
-            if(stateToSet==null) return;
+            if (stateToSet == null) return;
+
+            var handler = element.GetValue(VisualStateManager.AnimationHandlerProperty);
+            var animationGroupHandler = $"{handler}_{Name}";
+
+            element.AbortAnimation(animationGroupHandler);
 
             RaiseCurrentStateChanging(currentState, stateToSet, element);
+
             if (useTransitions)
             {
                 var transition = ResolveVisualTransition(currentStateName, stateName);
                 transition = transition ?? GenerateVisualTransition(element, currentStateName, stateName);
-                
+                //var tran
+                //var animation = new Animation().Add();
+                //var animation = transition.Storyboard.ToAnimation();
+                //var duration = (uint) 0;
+                //element.Animate(animationGroupHandler, animation, length: duration, easing: );
             }
+            else
+            {
+                var duration = stateToSet.Storyboard.Duration;
+                var animationLength = duration.HasTimeSpan ? (uint)duration.TimeSpan.TotalMilliseconds : uint.MaxValue;
 
+                var animation = stateToSet.Storyboard.ToAnimation();
+                element.Animate(animationGroupHandler, animation, length: animationLength, finished: (x, cancelled) => {});
+            }
+            
+            CurrentState = stateToSet;
             RaiseCurrentStateChanged(currentState, stateToSet, element);
         }
 

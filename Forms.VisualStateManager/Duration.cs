@@ -1,7 +1,9 @@
 using System;
+using Xamarin.Forms;
 
 namespace Forms.VisualStateManager
 {
+    [TypeConverter(typeof(DurationTypeConverter))]
     public struct Duration
     {
         private enum DurationType
