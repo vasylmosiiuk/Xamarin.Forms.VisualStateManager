@@ -19,19 +19,25 @@
                     <visualStateManager:VisualStateGroup Name="a" CurrentState="{Binding Source={x:Reference Root}, Path=CurrentState, Mode=OneWayToSource}">
                         <visualStateManager:VisualStateGroup.States>
                             <visualStateManager:VisualState Name="a1">
-                                <visualStateManager:Storyboard Easing="{x:Static Easing.CubicInOut}">
+                                <visualStateManager:Storyboard Easing="{x:Static Easing.Linear}">
                                     <animations:FloatAnimation
+                                        AutoReverse="True"
+                                        Easing="{x:Static Easing.CubicInOut}"
+                                        RepeatBehavior="Forever"
                                         Target="{x:Reference Frame}"
                                         TargetProperty="Frame.CornerRadius"
                                         From="0"
-                                        To="32"
+                                        To="48"
                                         Duration="0:0:2" />
-                                    <!--<animations:DoubleAnimation
+                                    <animations:DoubleAnimation
+                                        AutoReverse="True"
                                         BeginTime="0:0:2"
+                                        RepeatBehavior="Forever"
                                         Target="{x:Reference Frame}"
                                         TargetProperty="Frame.Opacity"
+                                        From="1"
                                         To="0"
-                                        Duration="0:0:0.1" />-->
+                                        Duration="0:0:2" />
                                 </visualStateManager:Storyboard>
                             </visualStateManager:VisualState>
                             <visualStateManager:VisualState Name="a2">
@@ -44,7 +50,7 @@
                                     <animations:FloatAnimation
                                         Target="{x:Reference Frame}"
                                         TargetProperty="Frame.CornerRadius"
-                                        To="0"
+                                        To="36"
                                         Duration="0:0:0.25" />
                                 </visualStateManager:Storyboard>
                             </visualStateManager:VisualState>

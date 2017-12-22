@@ -57,7 +57,8 @@ namespace Forms.VisualStateManager
 
         public bool Equals(Duration other)
         {
-            return _durationType == other._durationType && (_durationType != DurationType.TimeSpan || _timeSpan.Equals(other._timeSpan));
+            return _durationType == other._durationType &&
+                   (_durationType != DurationType.TimeSpan || _timeSpan.Equals(other._timeSpan));
         }
 
         public override int GetHashCode()
@@ -76,6 +77,32 @@ namespace Forms.VisualStateManager
         public static bool operator !=(Duration d1, Duration d2)
         {
             return !(d1 == d2);
+        }
+
+        public static Duration operator +(TimeSpan timeSpan, Duration duration)
+        {
+            if (duration.HasTimeSpan)
+                return new Duration(timeSpan + duration.TimeSpan);
+
+            return duration;
+        }
+
+        public static Duration operator +(Duration duration, TimeSpan timeSpan)
+        {
+            if (duration.HasTimeSpan)
+                return new Duration(timeSpan + duration.TimeSpan);
+
+            return duration;
+        }
+
+        public static Duration operator +(Duration duration1, Duration duration2)
+        {
+            if (duration1.HasTimeSpan && duration2.HasTimeSpan)
+                return new Duration(duration1.TimeSpan + duration2.TimeSpan);
+            if (duration1 == Forever || duration2 == Forever)
+                return Forever;
+
+            return Automatic;
         }
     }
 }

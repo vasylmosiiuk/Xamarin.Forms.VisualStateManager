@@ -89,7 +89,7 @@ namespace Forms.VisualStateManager
             else
             {
                 var duration = stateToSet.Storyboard.Duration;
-                var animationLength = duration.HasTimeSpan ? (uint)duration.TimeSpan.TotalMilliseconds : uint.MaxValue;
+                var animationLength = (uint)duration.ToTimeSpan().TotalMilliseconds;
 
                 var animation = stateToSet.Storyboard.ToAnimation();
                 element.Animate(animationGroupHandler, animation, length: animationLength, finished: (x, cancelled) => {});
