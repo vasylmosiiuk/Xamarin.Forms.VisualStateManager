@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading.Tasks;
 using Xamarin.Forms;
 
 namespace Forms.VisualStateManager
@@ -25,11 +23,6 @@ namespace Forms.VisualStateManager
         public static readonly BindableProperty NameProperty =
             BindableProperty.Create(nameof(Name), typeof(string), typeof(VisualStateGroup), default(string));
 
-        public static readonly BindablePropertyKey CurrentStatePropertyKey = BindableProperty.CreateReadOnly(
-            nameof(CurrentState),
-            typeof(VisualState), typeof(VisualStateGroup), default(VisualState));
-
-        public static readonly BindableProperty CurrentStateProperty = CurrentStatePropertyKey.BindableProperty;
         private readonly List<VisualTransition> _generatedTransitions = new List<VisualTransition>();
 
         public VisualStateCollection States
@@ -50,26 +43,23 @@ namespace Forms.VisualStateManager
             set => SetValue(NameProperty, value);
         }
 
-        public VisualState CurrentState
-        {
-            get => (VisualState) GetValue(CurrentStateProperty);
-            private set => SetValue(CurrentStatePropertyKey, value);
-        }
 
         public event EventHandler<VisualStateChangedEventArgs> CurrentStateChanging;
         public event EventHandler<VisualStateChangedEventArgs> CurrentStateChanged;
 
         internal void GoToState(VisualElement element, string stateName, bool useTransitions)
         {
-            var currentState = CurrentState;
+            var currentStates = VisualStateManager.GetCurrentStates(element);
+            var availableStates = States;
+            var currentState = currentStates?.FirstOrDefault(availableStates.Contains);
             var currentStateName = currentState?.Name;
 
-            if (currentStateName == stateName) return;
+            //if (currentStateName == stateName) return;
 
             var stateToSet = States.FirstOrDefault(x => x.Name == stateName);
             if (stateToSet == null) return;
 
-            var handler = element.GetValue(VisualStateManager.AnimationHandlerProperty);
+            var handler = VisualStateManager.GetAnimationHandler(element);
             var animationGroupHandler = $"{handler}_{Name}";
 
             element.AbortAnimation(animationGroupHandler);
@@ -89,13 +79,19 @@ namespace Forms.VisualStateManager
             else
             {
                 var duration = stateToSet.Storyboard.Duration;
-                var animationLength = (uint)duration.ToTimeSpan().TotalMilliseconds;
+                var animationLength = (uint) duration.ToTimeSpan().TotalMilliseconds;
 
-                var animation = stateToSet.Storyboard.ToAnimation();
-                element.Animate(animationGroupHandler, animation, length: animationLength, finished: (x, cancelled) => {});
+                var animation = stateToSet.Storyboard.ToAnimation(stateToSet.Storyboard.Target ?? element);
+                element.Animate(animationGroupHandler, animation, length: animationLength);
             }
-            
-            CurrentState = stateToSet;
+
+            var updatedStates = currentStates == null
+                ? new VisualStateCollection()
+                : currentState == null
+                    ? new VisualStateCollection(currentStates)
+                    : new VisualStateCollection(currentStates.Except(new[] {currentState}));
+            updatedStates.Add(stateToSet);
+            VisualStateManager.SetCurrentStates(element, updatedStates);
             RaiseCurrentStateChanged(currentState, stateToSet, element);
         }
 
@@ -160,11 +156,18 @@ namespace Forms.VisualStateManager
         }
     }
 
-    public class VisualStateCollection : ObservableCollection<VisualState>
+    public class VisualStateCollection : List<VisualState>
     {
+        internal VisualStateCollection(IEnumerable<VisualState> enumerable) : base(enumerable)
+        {
+        }
+
+        public VisualStateCollection()
+        {
+        }
     }
 
-    public class VisualTransitionCollection : ObservableCollection<VisualTransition>
+    public class VisualTransitionCollection : List<VisualTransition>
     {
     }
 }

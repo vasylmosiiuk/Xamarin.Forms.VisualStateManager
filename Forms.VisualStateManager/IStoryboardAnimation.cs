@@ -9,9 +9,8 @@ namespace Forms.VisualStateManager
         Easing Easing { get; set; }
         TimeSpan BeginTime { get; set; }
         Duration Duration { get; set; }
-        VisualElement Target { get; set; }
         RepeatBehavior RepeatBehavior { get; set; }
         bool AutoReverse { get; set; }
-        void Update(double x);
+        void Update(VisualElement target, double x);
     }
 }

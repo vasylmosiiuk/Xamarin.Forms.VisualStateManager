@@ -9,9 +9,8 @@ namespace Forms.VisualStateManager.Animations
         public TimeSpan BeginTime { get; set; }
         public Duration Duration { get; set; } = new Duration(TimeSpan.Zero);
         public BindableProperty TargetProperty { get; set; }
-        public VisualElement Target { get; set; }
         public RepeatBehavior RepeatBehavior { get; set; }
         public bool AutoReverse { get; set; }
-        public abstract void Update(double x);
+        public abstract void Update(VisualElement target, double x);
     }
 }

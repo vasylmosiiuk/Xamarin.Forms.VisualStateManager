@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Linq;
 using Xamarin.Forms;
 
@@ -10,21 +10,50 @@ namespace Forms.VisualStateManager
         private static readonly BindablePropertyKey AnimationHandlerPropertyKey = BindableProperty.CreateReadOnly(
             "AnimationHandler",
             typeof(string), typeof(VisualStateManager), null,
-            defaultValueCreator: (_) => $"VisualStateManager_{Guid.NewGuid():N}");
+            defaultValueCreator: GenerateAnimationHandler);
+
+        private static object GenerateAnimationHandler(BindableObject bindable)
+        {
+            if (bindable is Element element)
+                return element.Id.ToString("N");
+            return Guid.NewGuid().ToString("N");
+        }
 
         internal static readonly BindableProperty AnimationHandlerProperty =
             AnimationHandlerPropertyKey.BindableProperty;
 
+
         public static readonly BindableProperty VisualStateGroupsProperty = BindableProperty.CreateAttached(
-            "VisualStateGroups",
-            typeof(VisualStateGroupCollection), typeof(VisualStateManager), null,
-            defaultValueCreator: (_) => new VisualStateGroupCollection());
+            "VisualStateGroups", typeof(VisualStateGroupCollection), typeof(VisualStateManager), null);
 
-        public static VisualStateGroupCollection GetVisualStateGroups(BindableObject bindable) =>
-            (VisualStateGroupCollection) bindable.GetValue(VisualStateGroupsProperty);
+        private static readonly BindablePropertyKey CurrentStatesPropertyKey = BindableProperty.CreateAttachedReadOnly(
+            "CurrentStates", typeof(VisualStateCollection), typeof(VisualStateManager), null);
 
-        public static void SetVisualStateGroups(BindableObject bindable, VisualStateGroupCollection value) =>
+        public static readonly BindableProperty CurrentStatesProperty =
+            CurrentStatesPropertyKey.BindableProperty;
+
+        internal static string GetAnimationHandler(BindableObject bindable) =>
+            (string) bindable.GetValue(AnimationHandlerProperty);
+
+        public static VisualStateGroupCollection GetVisualStateGroups(BindableObject bindable)
+        {
+            return (VisualStateGroupCollection) bindable.GetValue(VisualStateGroupsProperty);
+        }
+
+        public static void SetVisualStateGroups(BindableObject bindable, VisualStateGroupCollection value)
+        {
             bindable.SetValue(VisualStateGroupsProperty, value);
+        }
+
+        public static VisualStateCollection GetCurrentStates(BindableObject bindable)
+        {
+            return (VisualStateCollection) bindable.GetValue(CurrentStatesProperty);
+        }
+
+        internal static void SetCurrentStates(BindableObject bindable, VisualStateCollection value)
+        {
+            bindable.SetValue(CurrentStatesPropertyKey, value);
+        }
 
         public static void GoToState(VisualElement element, string stateName, bool useTransitions)
         {
@@ -35,7 +64,7 @@ namespace Forms.VisualStateManager
         }
     }
 
-    public class VisualStateGroupCollection : ObservableCollection<VisualStateGroup>
+    public class VisualStateGroupCollection : List<VisualStateGroup>
     {
     }
 }
