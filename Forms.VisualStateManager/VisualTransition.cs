@@ -1,4 +1,3 @@
-using System;
 using Xamarin.Forms;
 
 namespace Forms.VisualStateManager
@@ -8,7 +7,8 @@ namespace Forms.VisualStateManager
     {
         public static readonly BindableProperty StoryboardProperty =
             BindableProperty.Create(nameof(Storyboard), typeof(Storyboard), typeof(VisualTransition),
-                default(Storyboard), coerceValue: EnsureStoryboardCorrect);
+                default(Storyboard), coerceValue: EnsureStoryboardCorrect,
+                defaultValueCreator: (_) => new Storyboard());
 
         public static readonly BindableProperty FromProperty =
             BindableProperty.Create(nameof(From), typeof(string), typeof(VisualTransition), default(string));
@@ -16,7 +16,7 @@ namespace Forms.VisualStateManager
 
         public static readonly BindableProperty ToProperty =
             BindableProperty.Create(nameof(To), typeof(string), typeof(VisualTransition), default(string));
-        
+
         public Storyboard Storyboard
         {
             get => (Storyboard) GetValue(StoryboardProperty);
@@ -34,7 +34,7 @@ namespace Forms.VisualStateManager
             get => (string) GetValue(ToProperty);
             set => SetValue(ToProperty, value);
         }
-        
+
         private static object EnsureStoryboardCorrect(BindableObject bindable, object value)
         {
             return value ?? new Storyboard();

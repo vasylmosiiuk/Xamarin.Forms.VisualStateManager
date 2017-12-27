@@ -11,44 +11,88 @@
                 <Setter Property="WidthRequest" Value="64" />
                 <Setter Property="HeightRequest" Value="64" />
                 <Setter Property="CornerRadius" Value="0" />
-                <Setter Property="visualStateManager:VisualStateManager.VisualStateGroups">
+                <Setter Property="Padding" Value="8" />
+                <Setter Property="ControlTemplate">
                     <Setter.Value>
-                        <visualStateManager:VisualStateGroupCollection>
-                            <visualStateManager:VisualStateGroup Name="a">
-                                <visualStateManager:VisualStateGroup.States>
-                                    <visualStateManager:VisualState Name="a1">
-                                        <visualStateManager:Storyboard>
-                                            <animations:FloatAnimation
-                                                AutoReverse="True"
-                                                Easing="{x:Static Easing.CubicInOut}"
-                                                RepeatBehavior="Forever"
-                                                TargetProperty="Frame.CornerRadius"
-                                                To="48"
-                                                Duration="0:0:2" />
-                                            <animations:DoubleAnimation
-                                                AutoReverse="True"
-                                                RepeatBehavior="Forever"
-                                                TargetProperty="Frame.Opacity"
-                                                From="1"
-                                                To="0"
-                                                Duration="0:0:2" />
-                                        </visualStateManager:Storyboard>
-                                    </visualStateManager:VisualState>
-                                    <visualStateManager:VisualState Name="a2">
-                                        <visualStateManager:Storyboard Easing="{x:Static Easing.CubicInOut}" Duration="Automatic">
-                                            <animations:DoubleAnimation
-                                                TargetProperty="Frame.Opacity"
-                                                To="1"
-                                                Duration="0:0:0.25" />
-                                            <animations:FloatAnimation
-                                                TargetProperty="Frame.CornerRadius"
-                                                To="36"
-                                                Duration="0:0:0.25" />
-                                        </visualStateManager:Storyboard>
-                                    </visualStateManager:VisualState>
-                                </visualStateManager:VisualStateGroup.States>
-                            </visualStateManager:VisualStateGroup>
-                        </visualStateManager:VisualStateGroupCollection>
+                        <ControlTemplate>
+                            <Grid>
+                                <Frame x:Name="innerBox" BackgroundColor="Wheat" />
+                                <visualStateManager:VisualStateManager.VisualStateGroups>
+                                    <visualStateManager:VisualStateGroupCollection>
+                                        <visualStateManager:VisualStateGroup Name="a">
+                                            <visualStateManager:VisualStateGroup.Transitions>
+                                                <visualStateManager:VisualTransition From="a1" To="a2">
+                                                    <visualStateManager:Storyboard Target="{x:Reference innerBox}">
+                                                        <animations:DoubleAnimation
+                                                            TargetProperty="Frame.Opacity"
+                                                            To="0"
+                                                            Duration="0:0:0.3" />
+                                                        <animations:DoubleAnimation
+                                                            BeginTime="0:0:0.3"
+                                                            TargetProperty="Frame.Opacity"
+                                                            From="0"
+                                                            To="1"
+                                                            Duration="0:0:0.3" />
+                                                    </visualStateManager:Storyboard>
+                                                </visualStateManager:VisualTransition>
+                                                <!--<visualStateManager:VisualTransition From="a2" To="a1">
+                                                    <visualStateManager:Storyboard Target="{x:Reference innerBox}">
+                                                        <animations:DoubleAnimation
+                                                            TargetProperty="Frame.Opacity"
+                                                            To="0"
+                                                            Duration="0:0:3" />
+                                                        <animations:DoubleAnimation
+                                                            BeginTime="0:0:3"
+                                                            TargetProperty="Frame.Opacity"
+                                                            From="0"
+                                                            To="1"
+                                                            Duration="0:0:3" />
+                                                    </visualStateManager:Storyboard>
+                                                </visualStateManager:VisualTransition>-->
+                                            </visualStateManager:VisualStateGroup.Transitions>
+                                            <visualStateManager:VisualStateGroup.States>
+                                                <visualStateManager:VisualState Name="a1">
+                                                    <visualStateManager:Storyboard Target="{x:Reference innerBox}">
+                                                        <animations:FloatAnimation
+                                                            AutoReverse="True"
+                                                            Easing="{x:Static Easing.CubicInOut}"
+                                                            FillBehavior="HoldEnd"
+                                                            RepeatBehavior="Forever"
+                                                            TargetProperty="Frame.CornerRadius"
+                                                            From="0"
+                                                            To="32"
+                                                            Duration="0:0:2" />
+                                                        <!--<animations:DoubleAnimation
+                                                            AutoReverse="True"
+                                                            RepeatBehavior="Forever"
+                                                            TargetProperty="Frame.Opacity"
+                                                            From="1"
+                                                            To="0"
+                                                            Duration="0:0:2" />-->
+                                                    </visualStateManager:Storyboard>
+                                                </visualStateManager:VisualState>
+                                                <visualStateManager:VisualState Name="a2">
+                                                    <visualStateManager:Storyboard
+                                                        Easing="{x:Static Easing.CubicInOut}"
+                                                        Target="{x:Reference innerBox}"
+                                                        Duration="Automatic">
+                                                        <animations:DoubleAnimation
+                                                            TargetProperty="Frame.Opacity"
+                                                            To="1"
+                                                            Duration="0:0:0.25" />
+                                                        <animations:FloatAnimation
+                                                            FillBehavior="HoldEnd"
+                                                            TargetProperty="Frame.CornerRadius"
+                                                            To="24"
+                                                            Duration="0:0:0.25" />
+                                                    </visualStateManager:Storyboard>
+                                                </visualStateManager:VisualState>
+                                            </visualStateManager:VisualStateGroup.States>
+                                        </visualStateManager:VisualStateGroup>
+                                    </visualStateManager:VisualStateGroupCollection>
+                                </visualStateManager:VisualStateManager.VisualStateGroups>
+                            </Grid>
+                        </ControlTemplate>
                     </Setter.Value>
                 </Setter>
             </Style>

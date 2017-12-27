@@ -32,14 +32,16 @@ namespace Forms.VisualStateManager
                 var finishAt = Math.Max(0, (animation.BeginTime.TotalMilliseconds + animationDurationMs) / durationMs);
 
                 Animation xFormsAnimation;
+
+                var state = animation.Prepare(target);
                 if (animation.RepeatBehavior.RepeatEnabled)
-                    xFormsAnimation = new Animation(RepeatUpdate(target,
+                    xFormsAnimation = new Animation(RepeatUpdate(state,
                             animation.Duration.ToTimeSpan().TotalMilliseconds / durationMs, beginAt,
                             finishAt, animation.AutoReverse, animation.Update, animation.Easing), beginAt, finishAt,
-                        storyboard.Easing);
+                        storyboard.Easing, ()=> animation.Cleanup(state));
                 else
-                    xFormsAnimation = new Animation(Update(target, beginAt, finishAt, animation.Update, animation.Easing),
-                        beginAt, finishAt, storyboard.Easing);
+                    xFormsAnimation = new Animation(Update(state, beginAt, finishAt, animation.Update, animation.Easing),
+                        beginAt, finishAt, storyboard.Easing, () => animation.Cleanup(state));
                 xFormsRootAnimation = xFormsRootAnimation.WithConcurrent(xFormsAnimation, beginAt, finishAt);
             }
 
@@ -47,8 +49,8 @@ namespace Forms.VisualStateManager
             return xFormsRootAnimation;
         }
 
-        private static Action<double> RepeatUpdate(VisualElement target, double singleAnimationDuration, double beginAt, double finishAt,
-            bool autoReverse, Action<VisualElement, double> update, Easing easing)
+        private static Action<double> RepeatUpdate(object state, double singleAnimationDuration, double beginAt, double finishAt,
+            bool autoReverse, Action<double, object> update, Easing easing)
         {
             return xGlobal =>
             {
@@ -63,12 +65,12 @@ namespace Forms.VisualStateManager
                     if (autoReverse && timesElapsed % 2 == 1)
                         x = 0.999999 - x;
                     if (x >= 0.0 && x <= 1.0)
-                        update(target, x);
+                        update(x, state);
                 }
             };
         }
 
-        private static Action<double> Update(VisualElement target, double beginAt, double finishAt, Action<VisualElement, double> update, Easing easing)
+        private static Action<double> Update(object state, double beginAt, double finishAt, Action<double, object> update, Easing easing)
         {
             var duration = finishAt - beginAt;
             return xGlobal =>
@@ -79,7 +81,7 @@ namespace Forms.VisualStateManager
                 if (easing != null)
                     x = easing.Ease(x);
                 if (x >= 0.0 && x <= 1.0)
-                    update(target, x);
+                    update(x, state);
             };
         }
 

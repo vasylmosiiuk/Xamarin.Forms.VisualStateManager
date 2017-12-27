@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Xamarin.Forms;
+using Xamarin.Forms.Internals;
 
 namespace Forms.VisualStateManager.Sample
 {
@@ -24,8 +25,7 @@ namespace Forms.VisualStateManager.Sample
             var currentState = VisualStateManager.GetCurrentStates(Frame1)?.FirstOrDefault();
             var currentStateName = currentState?.Name;
             var stateNameToSet = currentStateName == "a1" ? "a2" : "a1";
-            
-            VisualStateManager.GoToState(Frame1, stateNameToSet, false);
+            VisualStateManager.GoToState(Frame1, stateNameToSet, true);
         }
 
         private void OnStateSwitchButtonClicked2(object sender, EventArgs e)
@@ -34,7 +34,7 @@ namespace Forms.VisualStateManager.Sample
             var currentStateName = currentState?.Name;
             var stateNameToSet = currentStateName == "a1" ? "a2" : "a1";
 
-            VisualStateManager.GoToState(Frame3, stateNameToSet, false);
+            VisualStateManager.GoToState(Frame3, stateNameToSet, true);
         }
     }
 }

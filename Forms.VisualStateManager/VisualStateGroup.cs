@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Forms.VisualStateManager.Animations;
 using Xamarin.Forms;
 
 namespace Forms.VisualStateManager
@@ -47,72 +48,100 @@ namespace Forms.VisualStateManager
         public event EventHandler<VisualStateChangedEventArgs> CurrentStateChanging;
         public event EventHandler<VisualStateChangedEventArgs> CurrentStateChanged;
 
-        internal void GoToState(VisualElement element, string stateName, bool useTransitions)
+        internal void GoToState(VisualElement root, VisualElement target, string stateName, bool useTransitions)
         {
-            var currentStates = VisualStateManager.GetCurrentStates(element);
+            var currentStates = VisualStateManager.GetCurrentStates(root);
             var availableStates = States;
             var currentState = currentStates?.FirstOrDefault(availableStates.Contains);
             var currentStateName = currentState?.Name;
-
-            //if (currentStateName == stateName) return;
+            if (currentStateName == stateName) return;
 
             var stateToSet = States.FirstOrDefault(x => x.Name == stateName);
             if (stateToSet == null) return;
 
-            var handler = VisualStateManager.GetAnimationHandler(element);
+            var handler = VisualStateManager.GetAnimationHandler(target);
             var animationGroupHandler = $"{handler}_{Name}";
 
-            element.AbortAnimation(animationGroupHandler);
+            target.AbortAnimation(animationGroupHandler);
 
-            RaiseCurrentStateChanging(currentState, stateToSet, element);
+            RaiseCurrentStateChanging(currentState, stateToSet, root, target);
+
+            void StateSet()
+            {
+                var updatedStates = currentStates == null
+                    ? new VisualStateCollection()
+                    : currentState == null
+                        ? new VisualStateCollection(currentStates)
+                        : new VisualStateCollection(currentStates.Except(new[] {currentState}));
+                updatedStates.Add(stateToSet);
+                VisualStateManager.SetCurrentStates(root, updatedStates);
+                RaiseCurrentStateChanged(currentState, stateToSet, root, target);
+            }
+
+            var duration = stateToSet.Storyboard.Duration;
+            var animationLength = (uint) duration.ToTimeSpan().TotalMilliseconds;
+            var animation = stateToSet.Storyboard.ToAnimation(stateToSet.Storyboard.Target ?? target);
+
+            void RunAnimation()
+            {
+                target.Animate(animationGroupHandler, animation, length: animationLength, finished: (x, cancelled) =>
+                {
+                    if (cancelled)
+                        animation.GetCallback()(1.0);
+                });
+            }
 
             if (useTransitions)
             {
                 var transition = ResolveVisualTransition(currentStateName, stateName);
-                transition = transition ?? GenerateVisualTransition(element, currentStateName, stateName);
-                //var tran
-                //var animation = new Animation().Add();
-                //var animation = transition.Storyboard.ToAnimation();
-                //var duration = (uint) 0;
-                //element.Animate(animationGroupHandler, animation, length: duration, easing: );
+                transition = transition ?? GenerateVisualTransition(target, currentStateName, stateName);
+                if (transition?.Storyboard != null)
+                {
+                    var transitionAnimation = transition.Storyboard.ToAnimation(transition.Storyboard.Target ?? target);
+
+                    void TransitionAnimationFinished(double x, bool cancelled)
+                    {
+                        if (cancelled)
+                        {
+                            transitionAnimation.GetCallback()(1.0);
+                            return;
+                        }
+
+                        RunAnimation();
+                        StateSet();
+                    }
+
+                    var transitionAnimationDuration = transition.Storyboard.Duration;
+                    var transitionAnimationLength = (uint) transitionAnimationDuration.ToTimeSpan().TotalMilliseconds;
+                    target.Animate(animationGroupHandler, transitionAnimation, length: transitionAnimationLength,
+                        finished: TransitionAnimationFinished);
+                    return;
+                }
             }
-            else
-            {
-                var duration = stateToSet.Storyboard.Duration;
-                var animationLength = (uint) duration.ToTimeSpan().TotalMilliseconds;
-
-                var animation = stateToSet.Storyboard.ToAnimation(stateToSet.Storyboard.Target ?? element);
-                element.Animate(animationGroupHandler, animation, length: animationLength);
-            }
-
-            var updatedStates = currentStates == null
-                ? new VisualStateCollection()
-                : currentState == null
-                    ? new VisualStateCollection(currentStates)
-                    : new VisualStateCollection(currentStates.Except(new[] {currentState}));
-            updatedStates.Add(stateToSet);
-            VisualStateManager.SetCurrentStates(element, updatedStates);
-            RaiseCurrentStateChanged(currentState, stateToSet, element);
+            RunAnimation();
+            StateSet();
         }
 
-        private void RaiseCurrentStateChanging(VisualState fromState, VisualState toState, VisualElement element)
+        private void RaiseCurrentStateChanging(VisualState fromState, VisualState toState, VisualElement root,
+            VisualElement element)
         {
-            CurrentStateChanging?.Invoke(this, new VisualStateChangedEventArgs(fromState, toState, element));
+            CurrentStateChanging?.Invoke(this, new VisualStateChangedEventArgs(fromState, toState, root, element));
         }
 
-        private void RaiseCurrentStateChanged(VisualState fromState, VisualState toState, VisualElement element)
+        private void RaiseCurrentStateChanged(VisualState fromState, VisualState toState, VisualElement root,
+            VisualElement element)
         {
-            CurrentStateChanged?.Invoke(this, new VisualStateChangedEventArgs(fromState, toState, element));
+            CurrentStateChanged?.Invoke(this, new VisualStateChangedEventArgs(fromState, toState, root, element));
         }
 
-        protected virtual VisualTransition GenerateVisualTransition(VisualElement element, string fromState,
+        private VisualTransition GenerateVisualTransition(VisualElement target, string fromState,
             string toState)
         {
             var transition = new VisualTransition
             {
                 From = fromState,
                 To = toState,
-                Storyboard = GenerateVisualTransitionStoryboard(element, fromState, toState)
+                Storyboard = GenerateVisualTransitionStoryboard(target, fromState, toState)
             };
 
             _generatedTransitions.Add(transition);
@@ -120,9 +149,25 @@ namespace Forms.VisualStateManager
             return transition;
         }
 
-        private Storyboard GenerateVisualTransitionStoryboard(VisualElement element, string fromState, string toState)
+        protected virtual Storyboard GenerateVisualTransitionStoryboard(VisualElement target, string fromState,
+            string toState)
         {
-            return new Storyboard();
+            return new Storyboard()
+            {
+                Easing = Easing.CubicInOut,
+                Target = target,
+                Animations =
+                {
+                    new DoubleAnimation()
+                    {
+                        Duration = new Duration(TimeSpan.FromMilliseconds(250)),
+                        From = 1,
+                        To = 0,
+                        TargetProperty = VisualElement.OpacityProperty,
+                        FillBehavior = FillBehavior.Stop
+                    }
+                }
+            };
         }
 
         protected virtual VisualTransition ResolveVisualTransition(string fromVisualState, string toVisualState)

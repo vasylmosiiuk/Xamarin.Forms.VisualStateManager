@@ -57,10 +57,14 @@ namespace Forms.VisualStateManager
 
         public static void GoToState(VisualElement element, string stateName, bool useTransitions)
         {
-            var visualStateGroup = GetVisualStateGroups(element)
+            var target = element;
+            if (element is TemplatedView templatedView && templatedView.ControlTemplate != null)
+                target = templatedView.Children.FirstOrDefault() as VisualElement ?? target;
+
+            var visualStateGroup = GetVisualStateGroups(target)
                 .FirstOrDefault(x => x.States.Any(y => y.Name == stateName));
 
-            visualStateGroup?.GoToState(element, stateName, useTransitions);
+            visualStateGroup?.GoToState(element, target, stateName, useTransitions);
         }
     }
 

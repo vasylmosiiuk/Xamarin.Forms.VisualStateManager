@@ -5,41 +5,87 @@ namespace Forms.VisualStateManager.Animations
 {
     public sealed class DoubleAnimation : StoryboardAnimationBase
     {
-        private static readonly BindableProperty FromProperty =
-            BindableProperty.CreateAttached(Guid.NewGuid().ToString("N"), typeof(double), typeof(DoubleAnimation),
-                default(double));
-
         public double? From { get; set; }
         public double To { get; set; }
 
-        public override void Update(VisualElement target, double x)
+        public override object Prepare(VisualElement target) => new State(target, (double)target.GetValue(TargetProperty), From ?? (double) target.GetValue(TargetProperty));
+
+        public override void Update(double x, object stateRaw)
         {
-            if (!From.HasValue)
-                target.SetValue(FromProperty, target.GetValue(TargetProperty));
-            
-            var from = From ?? (double) target.GetValue(FromProperty);
-            var value = from + (To - from) * x;
-            target.SetValue(TargetProperty, value);
+            if (stateRaw is State state)
+            {
+                var value = state.From + (To - state.From) * x;
+                state.Target.SetValue(TargetProperty, value);
+            }
+        }
+
+        public override void Cleanup(object stateRaw)
+        {
+            if (stateRaw is State state)
+            {
+                if (FillBehavior == FillBehavior.Stop)
+                {
+                    state.Target.SetValue(TargetProperty, state.Default);
+                }
+            }
+        }
+
+        private class State
+        {
+            public readonly double Default;
+            public readonly double From;
+            public readonly VisualElement Target;
+
+            public State(VisualElement target, double @default, double from)
+            {
+                Target = target;
+                From = from;
+                Default = @default;
+            }
         }
     }
 
     public sealed class FloatAnimation : StoryboardAnimationBase
     {
-        private static readonly BindableProperty FromProperty =
-            BindableProperty.CreateAttached(Guid.NewGuid().ToString("N"), typeof(float), typeof(FloatAnimation),
-                default(float));
-
         public float? From { get; set; }
         public float To { get; set; }
 
-        public override void Update(VisualElement target, double x)
-        {
-            if (!From.HasValue)
-                target.SetValue(FromProperty, target.GetValue(TargetProperty));
 
-            var from = From ?? (float) target.GetValue(FromProperty);
-            var value = (float) (from + (To - from) * x);
-            target.SetValue(TargetProperty, value);
+        public override object Prepare(VisualElement target)
+        {
+            return new State(target, From ?? (float) target.GetValue(TargetProperty));
+        }
+
+        public override void Update(double x, object stateRaw)
+        {
+            if (stateRaw is State state)
+            {
+                var value = (float) (state.From + (To - state.From) * x);
+                state.Target.SetValue(TargetProperty, value);
+            }
+        }
+
+        public override void Cleanup(object stateRaw)
+        {
+            if (stateRaw is State state)
+            {
+                if (FillBehavior == FillBehavior.Stop)
+                {
+                    state.Target.SetValue(TargetProperty, state.From);
+                }
+            }
+        }
+
+        private class State
+        {
+            public readonly float From;
+            public readonly VisualElement Target;
+
+            public State(VisualElement target, float from)
+            {
+                Target = target;
+                From = from;
+            }
         }
     }
 }
