@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Xamarin.Forms;
 
@@ -14,8 +15,10 @@ namespace Forms.VisualStateManager
             get
             {
                 if (_duration == Duration.Automatic)
-                    return new Duration(Animations.Max(x =>
-                        x.CalculateExactAnimationDuration().ToTimeSpan().SumSafety(x.BeginTime)));
+                    return new Duration(Animations.Any()
+                        ? Animations.Max(x =>
+                            x.CalculateExactAnimationDuration().ToTimeSpan().SumSafety(x.BeginTime))
+                        : TimeSpan.Zero);
 
                 return _duration;
             }

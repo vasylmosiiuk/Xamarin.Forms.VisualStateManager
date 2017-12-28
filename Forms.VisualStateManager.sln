@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Forms.VisualStateManager.Sa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Forms.VisualStateManager.Sample.UWP", "Sample\Forms.VisualStateManager.Sample\Forms.VisualStateManager.Sample.UWP\Forms.VisualStateManager.Sample.UWP.csproj", "{1F71650C-12DD-45EB-8CF2-CC0E4C0C14B2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Forms.VisualStateManager.Sample", "Sample\Forms.VisualStateManager.Sample\Forms.VisualStateManager.Sample\Forms.VisualStateManager.Sample.csproj", "{B356D4F6-9C20-4E10-A1DB-0CC4232DA557}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Forms.VisualStateManager.Sample", "Sample\Forms.VisualStateManager.Sample\Forms.VisualStateManager.Sample\Forms.VisualStateManager.Sample.csproj", "{B356D4F6-9C20-4E10-A1DB-0CC4232DA557}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -33,15 +33,16 @@ namespace Forms.VisualStateManager
 
                 Animation xFormsAnimation;
 
-                var state = animation.Prepare(target);
+                var state = animation.StoreVisualState(target);
                 if (animation.RepeatBehavior.RepeatEnabled)
                     xFormsAnimation = new Animation(RepeatUpdate(state,
                             animation.Duration.ToTimeSpan().TotalMilliseconds / durationMs, beginAt,
                             finishAt, animation.AutoReverse, animation.Update, animation.Easing), beginAt, finishAt,
-                        storyboard.Easing, ()=> animation.Cleanup(state));
+                        storyboard.Easing, () => animation.RestoreVisualState(target, state));
                 else
-                    xFormsAnimation = new Animation(Update(state, beginAt, finishAt, animation.Update, animation.Easing),
-                        beginAt, finishAt, storyboard.Easing, () => animation.Cleanup(state));
+                    xFormsAnimation = new Animation(
+                        Update(state, beginAt, finishAt, animation.Update, animation.Easing),
+                        beginAt, finishAt, storyboard.Easing, () => animation.RestoreVisualState(target, state));
                 xFormsRootAnimation = xFormsRootAnimation.WithConcurrent(xFormsAnimation, beginAt, finishAt);
             }
 
@@ -49,9 +50,13 @@ namespace Forms.VisualStateManager
             return xFormsRootAnimation;
         }
 
-        private static Action<double> RepeatUpdate(object state, double singleAnimationDuration, double beginAt, double finishAt,
+        private static Action<double> RepeatUpdate(object state, double singleAnimationDuration, double beginAt,
+            double finishAt,
             bool autoReverse, Action<double, object> update, Easing easing)
         {
+            if (singleAnimationDuration < double.Epsilon)
+                throw new ArgumentOutOfRangeException(nameof(singleAnimationDuration), "Forever animation should have non-zero duration");
+
             return xGlobal =>
             {
                 if (xGlobal < finishAt)
@@ -70,7 +75,8 @@ namespace Forms.VisualStateManager
             };
         }
 
-        private static Action<double> Update(object state, double beginAt, double finishAt, Action<double, object> update, Easing easing)
+        private static Action<double> Update(object state, double beginAt, double finishAt,
+            Action<double, object> update, Easing easing)
         {
             var duration = finishAt - beginAt;
             return xGlobal =>

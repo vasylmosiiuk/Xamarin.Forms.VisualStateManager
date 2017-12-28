@@ -12,8 +12,8 @@ namespace Forms.VisualStateManager
         Duration Duration { get; set; }
         RepeatBehavior RepeatBehavior { get; set; }
         bool AutoReverse { get; set; }
-        object Prepare(VisualElement target);
+        object StoreVisualState(VisualElement target);
         void Update(double x, object state);
-        void Cleanup(object state);
+        void RestoreVisualState(VisualElement target, object state);
     }
 }

@@ -13,20 +13,26 @@ namespace Forms.VisualStateManager.Sample
             InitializeComponent();
         }
 
-        private void OnChangeStateButtonClick(object sender, EventArgs e)
+        protected override void OnAppearing()
         {
-            var root = (VisualElement)((VisualElement) sender).Parent;
-            var groups = VisualStateManager.GetVisualStateGroups(root);
+            base.OnAppearing();
 
-            if (groups?.Any() ?? false)
-            {
-                var currentAStateName = groups.FirstOrDefault(x => x.Name.StartsWith("a"))?.CurrentState?.Name;
-                var currentBStateName = groups.FirstOrDefault(x => x.Name.StartsWith("b"))?.CurrentState?.Name;
-                var stateNameToSet1 = currentAStateName == "a1" ? "a2" : "a1";
-                var stateNameToSet2 = currentBStateName == "b1" ? "b2" : "b1";
-                VisualStateManager.GoToState(root, stateNameToSet1, true);
-                VisualStateManager.GoToState(root, stateNameToSet2, true);
-            }
+            VisualStateManager.GoToState(Header, "Hidden", false);
+        }
+
+        public static readonly BindableProperty CurrentHeaderStateProperty = BindableProperty.Create(nameof(CurrentHeaderState), typeof(VisualState), typeof(MainPage), default(VisualState));
+
+        public VisualState CurrentHeaderState
+        {
+            get => (VisualState)GetValue(CurrentHeaderStateProperty);
+            set => SetValue(CurrentHeaderStateProperty, value);
+        }
+
+
+        private void OnTapped(object sender, EventArgs e)
+        {
+            var stateToSet = CurrentHeaderState?.Name == "Hidden" ? "Visible" : "Hidden";
+            VisualStateManager.GoToState(Header, stateToSet, true);
         }
     }
 }

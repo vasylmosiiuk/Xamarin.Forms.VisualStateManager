@@ -42,7 +42,6 @@ namespace Forms.VisualStateManager
         public static void GoToState(VisualElement element, string stateName, bool useTransitions)
         {
             var target = element;
-            VisualStateGroupCollection visualStateGroups;
             if (element is TemplatedView templatedView && templatedView.ControlTemplate != null)
             {
                 var controlTemplateRoot = templatedView.Children.FirstOrDefault() as VisualElement;
