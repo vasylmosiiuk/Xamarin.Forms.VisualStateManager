@@ -24,7 +24,18 @@ namespace Forms.VisualStateManager
         public static readonly BindableProperty NameProperty =
             BindableProperty.Create(nameof(Name), typeof(string), typeof(VisualStateGroup), default(string));
 
+        private static readonly BindablePropertyKey CurrentStatePropertyKey = BindableProperty.CreateReadOnly(
+            nameof(CurrentState),
+            typeof(VisualState), typeof(VisualStateGroup), default(VisualState));
+
+        public static readonly BindableProperty CurrentStateProperty = CurrentStatePropertyKey.BindableProperty;
         private readonly List<VisualTransition> _generatedTransitions = new List<VisualTransition>();
+
+        public VisualState CurrentState
+        {
+            get => (VisualState) GetValue(CurrentStateProperty);
+            private set => SetValue(CurrentStatePropertyKey, value);
+        }
 
         public VisualStateCollection States
         {
@@ -50,13 +61,12 @@ namespace Forms.VisualStateManager
 
         internal void GoToState(VisualElement root, VisualElement target, string stateName, bool useTransitions)
         {
-            var currentStates = VisualStateManager.GetCurrentStates(root);
-            var availableStates = States;
-            var currentState = currentStates?.FirstOrDefault(availableStates.Contains);
+            var currentState = CurrentState;
             var currentStateName = currentState?.Name;
             if (currentStateName == stateName) return;
 
-            var stateToSet = States.FirstOrDefault(x => x.Name == stateName);
+            var availableStates = States;
+            var stateToSet = availableStates.FirstOrDefault(x => x.Name == stateName);
             if (stateToSet == null) return;
 
             var handler = VisualStateManager.GetAnimationHandler(target);
@@ -66,29 +76,24 @@ namespace Forms.VisualStateManager
 
             RaiseCurrentStateChanging(currentState, stateToSet, root, target);
 
-            void StateSet()
-            {
-                var updatedStates = currentStates == null
-                    ? new VisualStateCollection()
-                    : currentState == null
-                        ? new VisualStateCollection(currentStates)
-                        : new VisualStateCollection(currentStates.Except(new[] {currentState}));
-                updatedStates.Add(stateToSet);
-                VisualStateManager.SetCurrentStates(root, updatedStates);
-                RaiseCurrentStateChanged(currentState, stateToSet, root, target);
-            }
-
             var duration = stateToSet.Storyboard.Duration;
             var animationLength = (uint) duration.ToTimeSpan().TotalMilliseconds;
             var animation = stateToSet.Storyboard.ToAnimation(stateToSet.Storyboard.Target ?? target);
 
+            void StateSet()
+            {
+                CurrentState = stateToSet;
+                RaiseCurrentStateChanged(currentState, stateToSet, root, target);
+            }
+
             void RunAnimation()
             {
-                target.Animate(animationGroupHandler, animation, length: animationLength, finished: (x, cancelled) =>
-                {
-                    if (cancelled)
-                        animation.GetCallback()(1.0);
-                });
+                target.Animate(animationGroupHandler, animation, length: animationLength,
+                    finished: (x, cancelled) =>
+                    {
+                        if (cancelled)
+                            animation.GetCallback()(1.0);
+                    });
             }
 
             if (useTransitions)
@@ -97,7 +102,8 @@ namespace Forms.VisualStateManager
                 transition = transition ?? GenerateVisualTransition(target, currentStateName, stateName);
                 if (transition?.Storyboard != null)
                 {
-                    var transitionAnimation = transition.Storyboard.ToAnimation(transition.Storyboard.Target ?? target);
+                    var transitionAnimation =
+                        transition.Storyboard.ToAnimation(transition.Storyboard.Target ?? target);
 
                     void TransitionAnimationFinished(double x, bool cancelled)
                     {
@@ -201,7 +207,7 @@ namespace Forms.VisualStateManager
         }
     }
 
-    public class VisualStateCollection : List<VisualState>
+    public sealed class VisualStateCollection : List<VisualState>
     {
         internal VisualStateCollection(IEnumerable<VisualState> enumerable) : base(enumerable)
         {
@@ -212,7 +218,7 @@ namespace Forms.VisualStateManager
         }
     }
 
-    public class VisualTransitionCollection : List<VisualTransition>
+    public sealed class VisualTransitionCollection : List<VisualTransition>
     {
     }
 }

@@ -13,28 +13,20 @@ namespace Forms.VisualStateManager.Sample
             InitializeComponent();
         }
 
-        protected override void OnAppearing()
+        private void OnChangeStateButtonClick(object sender, EventArgs e)
         {
-            base.OnAppearing();
+            var root = (VisualElement)((VisualElement) sender).Parent;
+            var groups = VisualStateManager.GetVisualStateGroups(root);
 
-            //VisualStateManager.GoToState(Frame, "a1", false);
-        }
-
-        private void OnStateSwitchButtonClicked(object sender, EventArgs e)
-        {
-            var currentState = VisualStateManager.GetCurrentStates(Frame1)?.FirstOrDefault();
-            var currentStateName = currentState?.Name;
-            var stateNameToSet = currentStateName == "a1" ? "a2" : "a1";
-            VisualStateManager.GoToState(Frame1, stateNameToSet, true);
-        }
-
-        private void OnStateSwitchButtonClicked2(object sender, EventArgs e)
-        {
-            var currentState = VisualStateManager.GetCurrentStates(Frame3)?.FirstOrDefault();
-            var currentStateName = currentState?.Name;
-            var stateNameToSet = currentStateName == "a1" ? "a2" : "a1";
-
-            VisualStateManager.GoToState(Frame3, stateNameToSet, true);
+            if (groups?.Any() ?? false)
+            {
+                var currentAStateName = groups.FirstOrDefault(x => x.Name.StartsWith("a"))?.CurrentState?.Name;
+                var currentBStateName = groups.FirstOrDefault(x => x.Name.StartsWith("b"))?.CurrentState?.Name;
+                var stateNameToSet1 = currentAStateName == "a1" ? "a2" : "a1";
+                var stateNameToSet2 = currentBStateName == "b1" ? "b2" : "b1";
+                VisualStateManager.GoToState(root, stateNameToSet1, true);
+                VisualStateManager.GoToState(root, stateNameToSet2, true);
+            }
         }
     }
 }

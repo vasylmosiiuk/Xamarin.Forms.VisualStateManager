@@ -8,20 +8,40 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <Style x:Key="Frame" TargetType="Frame">
-                <Setter Property="WidthRequest" Value="64" />
-                <Setter Property="HeightRequest" Value="64" />
+                <Setter Property="WidthRequest" Value="96" />
+                <Setter Property="HeightRequest" Value="132" />
                 <Setter Property="CornerRadius" Value="0" />
-                <Setter Property="Padding" Value="8" />
+                <Setter Property="Padding" Value="0" />
                 <Setter Property="ControlTemplate">
                     <Setter.Value>
                         <ControlTemplate>
-                            <Grid>
-                                <Frame x:Name="innerBox" BackgroundColor="Wheat" />
+                            <Grid RowSpacing="0" WidthRequest="96">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="96" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <Frame
+                                    x:Name="innerBox"
+                                    Grid.Row="0"
+                                    Margin="2"
+                                    BackgroundColor="Wheat" />
+                                <Frame
+                                    x:Name="innerBox2"
+                                    Grid.Row="0"
+                                    Margin="8"
+                                    BackgroundColor="Crimson" />
+                                <Button
+                                    Grid.Row="1"
+                                    Clicked="OnChangeStateButtonClick"
+                                    FontSize="8"
+                                    HeightRequest="32"
+                                    Text="Chage state"
+                                    VerticalOptions="Center" />
                                 <visualStateManager:VisualStateManager.VisualStateGroups>
                                     <visualStateManager:VisualStateGroupCollection>
                                         <visualStateManager:VisualStateGroup Name="a">
                                             <visualStateManager:VisualStateGroup.Transitions>
-                                                <visualStateManager:VisualTransition From="a1" To="a2">
+                                                <!--<visualStateManager:VisualTransition From="a1" To="a2">
                                                     <visualStateManager:Storyboard Target="{x:Reference innerBox}">
                                                         <animations:DoubleAnimation
                                                             TargetProperty="Frame.Opacity"
@@ -33,20 +53,6 @@
                                                             From="0"
                                                             To="1"
                                                             Duration="0:0:0.3" />
-                                                    </visualStateManager:Storyboard>
-                                                </visualStateManager:VisualTransition>
-                                                <!--<visualStateManager:VisualTransition From="a2" To="a1">
-                                                    <visualStateManager:Storyboard Target="{x:Reference innerBox}">
-                                                        <animations:DoubleAnimation
-                                                            TargetProperty="Frame.Opacity"
-                                                            To="0"
-                                                            Duration="0:0:3" />
-                                                        <animations:DoubleAnimation
-                                                            BeginTime="0:0:3"
-                                                            TargetProperty="Frame.Opacity"
-                                                            From="0"
-                                                            To="1"
-                                                            Duration="0:0:3" />
                                                     </visualStateManager:Storyboard>
                                                 </visualStateManager:VisualTransition>-->
                                             </visualStateManager:VisualStateGroup.Transitions>
@@ -89,6 +95,62 @@
                                                 </visualStateManager:VisualState>
                                             </visualStateManager:VisualStateGroup.States>
                                         </visualStateManager:VisualStateGroup>
+                                        <visualStateManager:VisualStateGroup Name="b">
+                                            <visualStateManager:VisualStateGroup.Transitions>
+                                                <!--<visualStateManager:VisualTransition From="a1" To="a2">
+                                                    <visualStateManager:Storyboard Target="{x:Reference innerBox}">
+                                                        <animations:DoubleAnimation
+                                                            TargetProperty="Frame.Opacity"
+                                                            To="0"
+                                                            Duration="0:0:0.3" />
+                                                        <animations:DoubleAnimation
+                                                            BeginTime="0:0:0.3"
+                                                            TargetProperty="Frame.Opacity"
+                                                            From="0"
+                                                            To="1"
+                                                            Duration="0:0:0.3" />
+                                                    </visualStateManager:Storyboard>
+                                                </visualStateManager:VisualTransition>-->
+                                            </visualStateManager:VisualStateGroup.Transitions>
+                                            <visualStateManager:VisualStateGroup.States>
+                                                <visualStateManager:VisualState Name="b1">
+                                                    <visualStateManager:Storyboard Target="{x:Reference innerBox2}">
+                                                        <animations:FloatAnimation
+                                                            AutoReverse="True"
+                                                            Easing="{x:Static Easing.CubicInOut}"
+                                                            FillBehavior="HoldEnd"
+                                                            RepeatBehavior="Forever"
+                                                            TargetProperty="Frame.CornerRadius"
+                                                            From="0"
+                                                            To="16"
+                                                            Duration="0:0:2" />
+                                                        <!--<animations:DoubleAnimation
+                                                            AutoReverse="True"
+                                                            RepeatBehavior="Forever"
+                                                            TargetProperty="Frame.Opacity"
+                                                            From="1"
+                                                            To="0"
+                                                            Duration="0:0:2" />-->
+                                                    </visualStateManager:Storyboard>
+                                                </visualStateManager:VisualState>
+                                                <visualStateManager:VisualState Name="b2">
+                                                    <visualStateManager:Storyboard
+                                                        Easing="{x:Static Easing.CubicInOut}"
+                                                        Target="{x:Reference innerBox2}"
+                                                        Duration="Automatic">
+                                                        <animations:DoubleAnimation
+                                                            TargetProperty="Frame.Opacity"
+                                                            To="1"
+                                                            Duration="0:0:0.25" />
+                                                        <animations:FloatAnimation
+                                                            FillBehavior="HoldEnd"
+                                                            TargetProperty="Frame.CornerRadius"
+                                                            To="12"
+                                                            Duration="0:0:0.25" />
+                                                    </visualStateManager:Storyboard>
+                                                </visualStateManager:VisualState>
+                                            </visualStateManager:VisualStateGroup.States>
+                                        </visualStateManager:VisualStateGroup>
                                     </visualStateManager:VisualStateGroupCollection>
                                 </visualStateManager:VisualStateManager.VisualStateGroups>
                             </Grid>
@@ -117,19 +179,5 @@
                 BackgroundColor="CadetBlue"
                 Style="{StaticResource Frame}" />
         </StackLayout>
-
-        <Button
-            Margin="0,20,0,0"
-            Clicked="OnStateSwitchButtonClicked"
-            HorizontalOptions="Center"
-            Text="Switch state"
-            WidthRequest="180" />
-
-        <Button
-            Margin="0,20,0,0"
-            Clicked="OnStateSwitchButtonClicked2"
-            HorizontalOptions="Center"
-            Text="Switch state"
-            WidthRequest="180" />
     </StackLayout>
 </ContentPage>

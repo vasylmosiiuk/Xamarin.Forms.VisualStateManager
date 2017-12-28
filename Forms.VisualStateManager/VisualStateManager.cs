@@ -25,13 +25,7 @@ namespace Forms.VisualStateManager
 
         public static readonly BindableProperty VisualStateGroupsProperty = BindableProperty.CreateAttached(
             "VisualStateGroups", typeof(VisualStateGroupCollection), typeof(VisualStateManager), null);
-
-        private static readonly BindablePropertyKey CurrentStatesPropertyKey = BindableProperty.CreateAttachedReadOnly(
-            "CurrentStates", typeof(VisualStateCollection), typeof(VisualStateManager), null);
-
-        public static readonly BindableProperty CurrentStatesProperty =
-            CurrentStatesPropertyKey.BindableProperty;
-
+        
         internal static string GetAnimationHandler(BindableObject bindable) =>
             (string) bindable.GetValue(AnimationHandlerProperty);
 
@@ -45,21 +39,16 @@ namespace Forms.VisualStateManager
             bindable.SetValue(VisualStateGroupsProperty, value);
         }
 
-        public static VisualStateCollection GetCurrentStates(BindableObject bindable)
-        {
-            return (VisualStateCollection) bindable.GetValue(CurrentStatesProperty);
-        }
-
-        internal static void SetCurrentStates(BindableObject bindable, VisualStateCollection value)
-        {
-            bindable.SetValue(CurrentStatesPropertyKey, value);
-        }
-
         public static void GoToState(VisualElement element, string stateName, bool useTransitions)
         {
             var target = element;
+            VisualStateGroupCollection visualStateGroups;
             if (element is TemplatedView templatedView && templatedView.ControlTemplate != null)
-                target = templatedView.Children.FirstOrDefault() as VisualElement ?? target;
+            {
+                var controlTemplateRoot = templatedView.Children.FirstOrDefault() as VisualElement;
+                if (GetVisualStateGroups(controlTemplateRoot) != null)
+                    target = controlTemplateRoot;
+            }
 
             var visualStateGroup = GetVisualStateGroups(target)
                 .FirstOrDefault(x => x.States.Any(y => y.Name == stateName));
