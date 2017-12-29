@@ -1,4 +1,5 @@
 ﻿using System;
+using Forms.VisualStateManager.Abstractions;
 
 namespace Forms.VisualStateManager.Helpers
 {

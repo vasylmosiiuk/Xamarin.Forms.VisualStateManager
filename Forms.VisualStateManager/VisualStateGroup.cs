@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Forms.VisualStateManager.Animations;
+using Forms.VisualStateManager.Abstractions;
 using Forms.VisualStateManager.Helpers;
 using Xamarin.Forms;
+using Xamarin.Forms.Internals;
 
 namespace Forms.VisualStateManager
 {
@@ -181,22 +182,7 @@ namespace Forms.VisualStateManager
         protected virtual Storyboard GenerateVisualTransitionStoryboard(VisualElement target, string fromState,
             string toState)
         {
-            return new Storyboard()
-            {
-                Target = target,
-                Animations =
-                {
-                    new DoubleAnimation()
-                    {
-                        Easing = Easing.CubicInOut,
-                        Duration = new Duration(TimeSpan.FromMilliseconds(250)),
-                        From = 1,
-                        To = 0,
-                        TargetProperty = VisualElement.OpacityProperty,
-                        FillBehavior = FillBehavior.Stop
-                    }
-                }
-            };
+            return new Storyboard();
         }
 
         protected virtual VisualTransition ResolveVisualTransition(string fromVisualState, string toVisualState)

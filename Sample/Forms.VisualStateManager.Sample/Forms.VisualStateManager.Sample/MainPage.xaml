@@ -2,7 +2,7 @@
     x:Class="Forms.VisualStateManager.Sample.MainPage"
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:animations="clr-namespace:Forms.VisualStateManager.Animations;assembly=Forms.VisualStateManager"
+    xmlns:animations="clr-namespace:Forms.VisualStateManager.Animations;assembly=Forms.VisualStateManager.Animations"
     xmlns:visualStateManager="clr-namespace:Forms.VisualStateManager;assembly=Forms.VisualStateManager"
     x:Name="Root">
     <Grid BackgroundColor="Beige">
@@ -31,7 +31,7 @@
                             </visualStateManager:VisualTransition>
                             <visualStateManager:VisualTransition To="Visible">
                                 <visualStateManager:Storyboard>
-                                    <animations:Setter TargetProperty="VisualElement.IsVisible" Value="True" />
+                                    <animations:Setter x:TypeArguments="x:Boolean" TargetProperty="VisualElement.IsVisible" Value="True" />
                                     <animations:DoubleAnimation
                                         Easing="{x:Static Easing.Linear}"
                                         TargetProperty="VisualElement.TranslationY"
@@ -43,15 +43,16 @@
                         </visualStateManager:VisualStateGroup.Transitions>
                         <visualStateManager:VisualState Name="Hidden">
                             <visualStateManager:Storyboard>
-                                <animations:Setter TargetProperty="VisualElement.TranslationY" Value="-64" />
-                                <animations:Setter TargetProperty="VisualElement.IsVisible" Value="False" />
+                                <animations:Setter x:TypeArguments="x:Double" TargetProperty="VisualElement.TranslationY" Value="-64" />
+                                <animations:Setter x:TypeArguments="x:Boolean" TargetProperty="VisualElement.IsVisible" Value="False" />
                             </visualStateManager:Storyboard>
                         </visualStateManager:VisualState>
                         <visualStateManager:VisualState Name="Visible">
                             <visualStateManager:Storyboard>
-                                <animations:Setter TargetProperty="VisualElement.TranslationY" Value="0" />
-                                <animations:Setter TargetProperty="VisualElement.IsVisible" Value="True" />
-                                <animations:ColorAnimationUsingKeyFrames FillBehavior="Stop"
+                                <animations:Setter x:TypeArguments="x:Double" TargetProperty="VisualElement.TranslationY" Value="0" />
+                                <animations:Setter x:TypeArguments="x:Boolean" TargetProperty="VisualElement.IsVisible" Value="True" />
+                                <animations:ColorAnimationUsingKeyFrames
+                                    FillBehavior="Stop"
                                     RepeatBehavior="Forever"
                                     TargetProperty="VisualElement.BackgroundColor"
                                     Duration="0:0:10">

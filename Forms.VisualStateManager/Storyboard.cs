@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Forms.VisualStateManager.Abstractions;
 using Forms.VisualStateManager.Helpers;
 using Xamarin.Forms;
+using Xamarin.Forms.Internals;
 
 namespace Forms.VisualStateManager
 {

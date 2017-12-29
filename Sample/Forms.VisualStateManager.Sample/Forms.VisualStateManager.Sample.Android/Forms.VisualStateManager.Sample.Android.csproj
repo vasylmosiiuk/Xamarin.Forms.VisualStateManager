@@ -82,6 +82,10 @@
     </AndroidResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Forms.VisualStateManager.Animations\Forms.VisualStateManager.Animations.csproj">
+      <Project>{b64472da-8899-4d65-9070-555812bce55a}</Project>
+      <Name>Forms.VisualStateManager.Animations</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Forms.VisualStateManager\Forms.VisualStateManager.csproj">
       <Project>{d5f003e1-a27e-4018-8fa1-6f1f6f11b009}</Project>
       <Name>Forms.VisualStateManager</Name>

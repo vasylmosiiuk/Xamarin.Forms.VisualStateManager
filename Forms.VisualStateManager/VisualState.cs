@@ -1,4 +1,5 @@
-﻿using Forms.VisualStateManager.Helpers;
+﻿using Forms.VisualStateManager.Abstractions;
+using Forms.VisualStateManager.Helpers;
 using Xamarin.Forms;
 
 namespace Forms.VisualStateManager

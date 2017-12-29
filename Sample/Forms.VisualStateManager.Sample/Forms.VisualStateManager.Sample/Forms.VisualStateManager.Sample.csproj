@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Forms.VisualStateManager.Animations\Forms.VisualStateManager.Animations.csproj" />
     <ProjectReference Include="..\..\..\Forms.VisualStateManager\Forms.VisualStateManager.csproj" />
   </ItemGroup>
 

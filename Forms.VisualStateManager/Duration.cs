@@ -1,4 +1,5 @@
 using System;
+using Forms.VisualStateManager.TypeConverters;
 using Xamarin.Forms;
 
 namespace Forms.VisualStateManager
@@ -58,7 +59,7 @@ namespace Forms.VisualStateManager
         public bool Equals(Duration other)
         {
             return _durationType == other._durationType &&
-                   (_durationType != DurationType.TimeSpan || _timeSpan.Equals(other._timeSpan));
+                   (_durationType != DurationType.TimeSpan || _timeSpan == other._timeSpan);
         }
 
         public override int GetHashCode()

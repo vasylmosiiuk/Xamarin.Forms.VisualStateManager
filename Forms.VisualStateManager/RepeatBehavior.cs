@@ -1,4 +1,5 @@
 using System;
+using Forms.VisualStateManager.TypeConverters;
 using Xamarin.Forms;
 
 namespace Forms.VisualStateManager
