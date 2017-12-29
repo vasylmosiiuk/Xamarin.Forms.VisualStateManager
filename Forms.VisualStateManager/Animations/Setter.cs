@@ -1,28 +1,28 @@
 ﻿using System;
-using System.Reflection;
+using Forms.VisualStateManager.Helpers;
 using Xamarin.Forms;
-using Xamarin.Forms.Xaml;
-using Xamarin.Forms.Xaml.Internals;
 
 namespace Forms.VisualStateManager.Animations
 {
-    public class Setter : IStoryboardAnimation
+    public class Setter : IAnimation
     {
         private readonly Duration _duration = new Duration(TimeSpan.Zero);
         private readonly RepeatBehavior _repeatBehavior = new RepeatBehavior();
+        private TimeSpan _beginTime;
         private object _convertedValue;
+        private Easing _easing = Easing.Linear;
+        private FillBehavior _fillBehavior = FillBehavior.HoldEnd;
+        private bool _isApplied;
         private BindableProperty _targetProperty;
         private object _value;
-        private bool _valueSet;
 
         public object Value
         {
             get => _value;
             set
             {
+                this.ThrowIfApplied();
                 _value = value;
-                _valueSet = true;
-                RefreshValue();
             }
         }
 
@@ -31,34 +31,70 @@ namespace Forms.VisualStateManager.Animations
             get => _targetProperty;
             set
             {
+                this.ThrowIfApplied();
                 _targetProperty = value;
-                RefreshValue();
             }
         }
 
-        public FillBehavior FillBehavior { get; set; } = FillBehavior.HoldEnd;
-        public Easing Easing { get; set; } = Easing.Linear;
-        public TimeSpan BeginTime { get; set; }
+        public FillBehavior FillBehavior
+        {
+            get => _fillBehavior;
+            set
+            {
+                this.ThrowIfApplied();
+                _fillBehavior = value;
+            }
+        }
+
+        public Easing Easing
+        {
+            get => _easing;
+            set
+            {
+                this.ThrowIfApplied();
+                _easing = value;
+            }
+        }
+
+        public TimeSpan BeginTime
+        {
+            get => _beginTime;
+            set
+            {
+                this.ThrowIfApplied();
+                _beginTime = value;
+            }
+        }
 
         public Duration Duration
         {
             get => _duration;
-            set => throw new InvalidOperationException($"nameof(Duration) can't be changed");
+            set => throw new InvalidOperationException($"{nameof(Duration)} can't be changed");
         }
 
         public RepeatBehavior RepeatBehavior
         {
             get => _repeatBehavior;
-            set => throw new InvalidOperationException($"nameof(AutoReverse) isn't supported");
+            set => throw new InvalidOperationException($"{nameof(AutoReverse)} isn't supported");
         }
 
         public bool AutoReverse
         {
             get => false;
-            set => throw new InvalidOperationException($"nameof(AutoReverse) isn't supported");
+            set => throw new InvalidOperationException($"{nameof(AutoReverse)} isn't supported");
         }
 
-        public object StoreVisualState(VisualElement target)
+        public bool IsApplied
+        {
+            get => _isApplied;
+            private set
+            {
+                this.ThrowIfApplied();
+                _isApplied = value;
+            }
+        }
+
+        public object StoreAnimationState(BindableObject target)
         {
             if (target == null) throw new ArgumentNullException(nameof(target));
 
@@ -81,7 +117,7 @@ namespace Forms.VisualStateManager.Animations
             }
         }
 
-        public void RestoreVisualState(VisualElement target, object stateRaw)
+        public void RestoreAnimationState(BindableObject target, object stateRaw)
         {
             if (stateRaw == null || target == null) return;
             if (stateRaw is State state)
@@ -102,22 +138,23 @@ namespace Forms.VisualStateManager.Animations
             }
         }
 
-        private void RefreshValue()
+        public void Apply()
         {
-            if (_valueSet)
-            {
-                Func<MemberInfo> mInfoRetriever = null;
-                    _convertedValue = _value?.ConvertTo(TargetProperty.ReturnType, mInfoRetriever,
-                        new XamlServiceProvider());
-            }
+            _convertedValue = FixValue();
+            IsApplied = true;
+        }
+
+        private object FixValue()
+        {
+            return _value?.ConvertTo(TargetProperty.ReturnType, null, DependencyService.Get<IServiceProvider>());
         }
 
         private class State
         {
             public readonly object StoredValue;
-            public readonly VisualElement Target;
+            public readonly BindableObject Target;
 
-            public State(VisualElement target, object storedValue)
+            public State(BindableObject target, object storedValue)
             {
                 Target = target;
                 StoredValue = storedValue;

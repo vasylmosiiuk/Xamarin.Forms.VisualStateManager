@@ -30,10 +30,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using Xamarin.Forms;
 using Xamarin.Forms.Internals;
 using Xamarin.Forms.Xaml.Internals;
 
-namespace Xamarin.Forms.Xaml
+namespace Forms.VisualStateManager.Helpers
 {
     internal static class TypeConversionExtensions
     {

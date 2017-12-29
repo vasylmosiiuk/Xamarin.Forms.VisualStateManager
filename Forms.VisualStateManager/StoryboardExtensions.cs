@@ -15,7 +15,7 @@ namespace Forms.VisualStateManager
                 durationMs = storyboard.Animations.Where(x => x.Duration.HasTimeSpan)
                     .Max(x => x.BeginTime + x.Duration.TimeSpan).TotalMilliseconds;
 
-            var xFormsRootAnimation = new Animation(_ => { }, 0.0, durationMs, storyboard.Easing);
+            var xFormsRootAnimation = new Animation(_ => { }, 0.0, durationMs, Easing.Linear);
 
             foreach (var animation in storyboard.Animations)
             {
@@ -33,16 +33,16 @@ namespace Forms.VisualStateManager
 
                 Animation xFormsAnimation;
 
-                var state = animation.StoreVisualState(target);
+                var state = animation.StoreAnimationState(target);
                 if (animation.RepeatBehavior.RepeatEnabled)
                     xFormsAnimation = new Animation(RepeatUpdate(state,
                             animation.Duration.ToTimeSpan().TotalMilliseconds / durationMs, beginAt,
                             finishAt, animation.AutoReverse, animation.Update, animation.Easing), beginAt, finishAt,
-                        storyboard.Easing, () => animation.RestoreVisualState(target, state));
+                        Easing.Linear, () => animation.RestoreAnimationState(target, state));
                 else
                     xFormsAnimation = new Animation(
                         Update(state, beginAt, finishAt, animation.Update, animation.Easing),
-                        beginAt, finishAt, storyboard.Easing, () => animation.RestoreVisualState(target, state));
+                        beginAt, finishAt, Easing.Linear, () => animation.RestoreAnimationState(target, state));
                 xFormsRootAnimation = xFormsRootAnimation.WithConcurrent(xFormsAnimation, beginAt, finishAt);
             }
 
@@ -55,7 +55,8 @@ namespace Forms.VisualStateManager
             bool autoReverse, Action<double, object> update, Easing easing)
         {
             if (singleAnimationDuration < double.Epsilon)
-                throw new ArgumentOutOfRangeException(nameof(singleAnimationDuration), "Forever animation should have non-zero duration");
+                throw new ArgumentOutOfRangeException(nameof(singleAnimationDuration),
+                    "Forever animation should have non-zero duration");
 
             return xGlobal =>
             {
@@ -91,7 +92,7 @@ namespace Forms.VisualStateManager
             };
         }
 
-        public static Duration CalculateExactAnimationDuration(this IStoryboardAnimation animation)
+        public static Duration CalculateExactAnimationDuration(this IAnimation animation)
         {
             var singleAnimationDuration = animation.Duration;
             var repeatBehavior = animation.RepeatBehavior;

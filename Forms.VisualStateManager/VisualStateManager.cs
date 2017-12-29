@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Forms.VisualStateManager.Helpers;
 using Xamarin.Forms;
 
 namespace Forms.VisualStateManager
@@ -24,8 +25,17 @@ namespace Forms.VisualStateManager
 
 
         public static readonly BindableProperty VisualStateGroupsProperty = BindableProperty.CreateAttached(
-            "VisualStateGroups", typeof(VisualStateGroupCollection), typeof(VisualStateManager), null);
-        
+            "VisualStateGroups", typeof(VisualStateGroupCollection), typeof(VisualStateManager), null, propertyChanged: OnVisualStateGroupsChanged);
+
+        private static void OnVisualStateGroupsChanged(BindableObject bindable, object oldvalue, object newvalue)
+        {
+            if (newvalue is VisualStateGroupCollection visualStateGroups)
+            {
+                foreach (var visualStateGroup in visualStateGroups)
+                    visualStateGroup.ApplySafety();
+            }
+        }
+
         internal static string GetAnimationHandler(BindableObject bindable) =>
             (string) bindable.GetValue(AnimationHandlerProperty);
 

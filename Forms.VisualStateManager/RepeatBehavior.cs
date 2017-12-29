@@ -35,7 +35,7 @@ namespace Forms.VisualStateManager
 
         public bool HasDuration => _repeatType == RepeatType.Duration;
         public bool HasCount => _repeatType == RepeatType.Count;
-        public bool RepeatEnabled => _repeatType != RepeatType.Single;
+        public bool RepeatEnabled => _repeatType != RepeatType.Single && (!HasCount || Count > 1);
         public static RepeatBehavior Forever { get; } = new RepeatBehavior(RepeatType.Forever);
 
         public TimeSpan Duration

@@ -1,21 +1,27 @@
+using Forms.VisualStateManager.Helpers;
 using Xamarin.Forms;
 
 namespace Forms.VisualStateManager
 {
     [ContentProperty(nameof(Storyboard))]
-    public class VisualTransition : BindableObject
+    public class VisualTransition : BindableObject, IApplicable
     {
         public static readonly BindableProperty StoryboardProperty =
             BindableProperty.Create(nameof(Storyboard), typeof(Storyboard), typeof(VisualTransition),
                 default(Storyboard), coerceValue: EnsureStoryboardCorrect,
-                defaultValueCreator: (_) => new Storyboard());
+                defaultValueCreator: (_) => new Storyboard(),
+                propertyChanged: OnPropertyChanged);
 
         public static readonly BindableProperty FromProperty =
-            BindableProperty.Create(nameof(From), typeof(string), typeof(VisualTransition), default(string));
+            BindableProperty.Create(nameof(From), typeof(string), typeof(VisualTransition), default(string),
+                propertyChanged: OnPropertyChanged);
 
 
         public static readonly BindableProperty ToProperty =
-            BindableProperty.Create(nameof(To), typeof(string), typeof(VisualTransition), default(string));
+            BindableProperty.Create(nameof(To), typeof(string), typeof(VisualTransition), default(string),
+                propertyChanged: OnPropertyChanged);
+
+        private bool _isApplied;
 
         public Storyboard Storyboard
         {
@@ -34,6 +40,25 @@ namespace Forms.VisualStateManager
             get => (string) GetValue(ToProperty);
             set => SetValue(ToProperty, value);
         }
+
+        public bool IsApplied
+        {
+            get => _isApplied;
+            private set
+            {
+                this.ThrowIfApplied();
+                _isApplied = value;
+            }
+        }
+
+        public void Apply()
+        {
+            Storyboard.ApplySafety();
+            IsApplied = true;
+        }
+
+        private static void OnPropertyChanged(BindableObject bindable, object oldvalue, object newvalue) =>
+            ((IApplicable) bindable).ThrowIfApplied();
 
         private static object EnsureStoryboardCorrect(BindableObject bindable, object value)
         {

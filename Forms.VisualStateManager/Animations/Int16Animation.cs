@@ -2,9 +2,9 @@
 
 namespace Forms.VisualStateManager.Animations
 {
-    public sealed class Int16Animation : FromToPrimitiveAnimation<FromToAnimationState<short>, short>
+    public sealed class Int16Animation : LinearPrimitiveAnimation<short>
     {
-        protected override void Update(double x, FromToAnimationState<short> state)
+        protected override void Update(double x, LinearAnimationState<short> state)
         {
             var value = state.From + (To - state.From) * x;
             state.Target.SetValue(TargetProperty, (short)value);

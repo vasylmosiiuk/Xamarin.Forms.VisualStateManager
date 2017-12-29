@@ -3,7 +3,7 @@ using Xamarin.Forms;
 
 namespace Forms.VisualStateManager
 {
-    public interface IStoryboardAnimation
+    public interface IAnimation : IApplicable
     {
         BindableProperty TargetProperty { get; set; }
         FillBehavior FillBehavior { get; set; }
@@ -12,8 +12,8 @@ namespace Forms.VisualStateManager
         Duration Duration { get; set; }
         RepeatBehavior RepeatBehavior { get; set; }
         bool AutoReverse { get; set; }
-        object StoreVisualState(VisualElement target);
+        object StoreAnimationState(BindableObject target);
         void Update(double x, object state);
-        void RestoreVisualState(VisualElement target, object state);
+        void RestoreAnimationState(BindableObject target, object state);
     }
 }

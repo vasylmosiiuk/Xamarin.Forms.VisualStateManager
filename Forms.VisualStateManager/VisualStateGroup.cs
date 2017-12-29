@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Forms.VisualStateManager.Animations;
+using Forms.VisualStateManager.Helpers;
 using Xamarin.Forms;
 
 namespace Forms.VisualStateManager
 {
     [ContentProperty(nameof(States))]
-    public class VisualStateGroup : BindableObject
+    public class VisualStateGroup : BindableObject, IApplicable
     {
         private static readonly BindablePropertyKey TransitionsPropertyKey =
             BindableProperty.CreateReadOnly(nameof(Transitions), typeof(VisualTransitionCollection),
@@ -22,7 +23,8 @@ namespace Forms.VisualStateManager
         public static readonly BindableProperty StatesProperty = StatesPropertyKey.BindableProperty;
 
         public static readonly BindableProperty NameProperty =
-            BindableProperty.Create(nameof(Name), typeof(string), typeof(VisualStateGroup), default(string));
+            BindableProperty.Create(nameof(Name), typeof(string), typeof(VisualStateGroup), default(string),
+                propertyChanged: OnPropertyChanged);
 
         private static readonly BindablePropertyKey CurrentStatePropertyKey = BindableProperty.CreateReadOnly(
             nameof(CurrentState),
@@ -30,6 +32,7 @@ namespace Forms.VisualStateManager
 
         public static readonly BindableProperty CurrentStateProperty = CurrentStatePropertyKey.BindableProperty;
         private readonly List<VisualTransition> _generatedTransitions = new List<VisualTransition>();
+        private bool _isApplied;
 
         public VisualState CurrentState
         {
@@ -54,6 +57,26 @@ namespace Forms.VisualStateManager
             get => (string) GetValue(NameProperty);
             set => SetValue(NameProperty, value);
         }
+
+        public bool IsApplied
+        {
+            get => _isApplied;
+            private set
+            {
+                this.ThrowIfApplied();
+                _isApplied = value;
+            }
+        }
+
+        public void Apply()
+        {
+            Transitions.ForEach(x=>x.ApplySafety());
+            States.ForEach(x=>x.ApplySafety());
+            IsApplied = true;
+        }
+
+        private static void OnPropertyChanged(BindableObject bindable, object oldvalue, object newvalue) =>
+            ((IApplicable) bindable).ThrowIfApplied();
 
 
         public event EventHandler<VisualStateChangedEventArgs> CurrentStateChanging;
@@ -160,12 +183,12 @@ namespace Forms.VisualStateManager
         {
             return new Storyboard()
             {
-                Easing = Easing.CubicInOut,
                 Target = target,
                 Animations =
                 {
                     new DoubleAnimation()
                     {
+                        Easing = Easing.CubicInOut,
                         Duration = new Duration(TimeSpan.FromMilliseconds(250)),
                         From = 1,
                         To = 0,

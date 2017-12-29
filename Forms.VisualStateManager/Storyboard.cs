@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Forms.VisualStateManager.Helpers;
 using Xamarin.Forms;
 
 namespace Forms.VisualStateManager
 {
     [ContentProperty(nameof(Animations))]
-    public sealed class Storyboard : BindableObject
+    public sealed class Storyboard : BindableObject, IApplicable
     {
         private Duration _duration = Duration.Automatic;
+        private bool _isApplied;
+        private VisualElement _target;
 
         public Duration Duration
         {
@@ -22,11 +25,39 @@ namespace Forms.VisualStateManager
 
                 return _duration;
             }
-            set => _duration = value;
+            set
+            {
+                this.ThrowIfApplied();
+                _duration = value;
+            }
         }
 
-        public Easing Easing { get; set; } = Easing.Linear;
-        public IList<IStoryboardAnimation> Animations { get; } = new List<IStoryboardAnimation>();
-        public VisualElement Target { get; set; }
+        public List<IAnimation> Animations { get; } = new List<IAnimation>();
+
+        public VisualElement Target
+        {
+            get => _target;
+            set
+            {
+                this.ThrowIfApplied();
+                _target = value;
+            }
+        }
+
+        public bool IsApplied
+        {
+            get => _isApplied;
+            private set
+            {
+                this.ThrowIfApplied();
+                _isApplied = value;
+            }
+        }
+
+        public void Apply()
+        {
+            Animations.ForEach(x=>x.ApplySafety());
+            IsApplied = true;
+        }
     }
 }

@@ -3,9 +3,9 @@ using Xamarin.Forms;
 
 namespace Forms.VisualStateManager.Animations
 {
-    public sealed class ThicknessAnimation : FromToPrimitiveAnimation<FromToAnimationState<Thickness>, Thickness>
+    public sealed class ThicknessAnimation : LinearPrimitiveAnimation<Thickness>
     {
-        protected override void Update(double x, FromToAnimationState<Thickness> state)
+        protected override void Update(double x, LinearAnimationState<Thickness> state)
         {
             var from = state.From;
             var to = To;
