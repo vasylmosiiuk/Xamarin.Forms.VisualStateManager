@@ -82,13 +82,17 @@
     </AndroidResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Forms.VisualStateManager.Animations\Forms.VisualStateManager.Animations.csproj">
-      <Project>{b64472da-8899-4d65-9070-555812bce55a}</Project>
-      <Name>Forms.VisualStateManager.Animations</Name>
+    <ProjectReference Include="..\..\..\Forms.Media\Forms.Media.csproj">
+      <Project>{aa7efef1-91f5-4218-9600-41d75e198039}</Project>
+      <Name>Forms.Media</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Forms.VisualStateManager\Forms.VisualStateManager.csproj">
+    <ProjectReference Include="..\..\..\Forms.Media.Animations\Forms.Media.Animations.csproj">
+      <Project>{b64472da-8899-4d65-9070-555812bce55a}</Project>
+      <Name>Forms.Media.Animations</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Forms.Media.VisualStateManager\Forms.Media.VisualStateManager.csproj">
       <Project>{d5f003e1-a27e-4018-8fa1-6f1f6f11b009}</Project>
-      <Name>Forms.VisualStateManager</Name>
+      <Name>Forms.Media.VisualStateManager</Name>
     </ProjectReference>
     <ProjectReference Include="..\Forms.VisualStateManager.Sample\Forms.VisualStateManager.Sample.csproj">
       <Project>{C71B2F7B-720B-4E6C-8991-E5B9FF28CE96}</Project>
